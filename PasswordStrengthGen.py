@@ -1,9 +1,9 @@
-# Imports
 import string
 import random
 import streamlit as st
 import joblib
 import sklearn
+import re
 
 
 # Tokenizer for password vectorizer
@@ -40,6 +40,36 @@ def generate_strong_password(length):
     password = ''.join(random.choice(characters) for i in range(length))
     return password
 
+def password_strength(password):
+    length = len(password)
+    score = 0
+
+    if length >= 8:
+        score += 1
+    if re.search("[a-z]", password):
+        score += 1
+    if re.search("[A-Z]", password):
+        score += 1
+    if re.search("[0-9]", password):
+        score += 1
+    if re.search("[@#$%^&+=]", password):
+        score += 1
+
+    return score
+
+
+st.markdown(
+    """
+    <style>
+    .password-strength-bar {height: 10px; border-radius: 5px; background-color: #ddd; margin-top: 10px;}
+    .Weak {background-color: red;}
+    .Medium {background-color: orange;}
+    .Strong {background-color: green;}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Containers
 title = st.container()
@@ -48,30 +78,66 @@ password_gen = st.container()
 
 # Title of webpage
 with title:
-    st.title("Password Strength Checker and Generator :key:")
+    st.title("Password Strength Checker & Generator :key:")
+    with st.expander('About this app'):
+        st.write("This application helps you to check the strength of your password using the power of machine learning and AI"
+                 "It can also create a strong password or passphrase for you.")
+        st.markdown('**How to use this app**')
+        st.markdown('***Checking password strength***')
+        st.info('To check the strength of your password, enter it into the \"Check Password Strength\" input field below. '
+                'Once done so, click \"check\" to have your password put to the test against our strength checker!')
+        st.markdown('***Password/Passphrase Generator***')
+        st.info('To generate a strong password or passphrase, use the dropdown list to select which option you\'d like to choose. '
+                'Once you\'ve decided, use the slider to select the length of your pass-word\phrase and click \"Generate\".')
+
+        st.markdown('**My promise to you**')
+        st.warning("This application does not store any information about you nor does it store your inputted or generated pass-words/phrases.")
     st.write("""
-    This application helps you to check the strength of your password and generate a strong password.
-    It uses the power of machine learning and AI to predict the strength of your password.
-    """)
+    Welcome to my password strength checker and generator! This application will help you to check the strength of your password 
+    using the power of machine learning and AI!""")
+    st.write("It will also help you to generate a strong password or passphrase for you to use to help prevent hackers from cracking your password! ")
+
+
 
 # Password strength checker
 with strength_check:
-    st.header("Check Password Strength")
-    input_password = st.text_input("Input your password", type="password")
     prediction = load_model()
     vectorizer = load_vectorizer()
+
+    st.header("Check Password Strength")
+    input_password = st.text_input("Input your password", type="password")
 
     # If the button is clicked, the loaded ML model will predict the inputted password
     # and produce an output
     if st.button("Check"):
         vect_pswd = vectorizer.transform([input_password]).toarray()
         prediction_output = prediction.predict(vect_pswd)
+        result = ''
         if prediction_output == 0:
+            result = 'Weak'
             st.error("Weak")
         elif prediction_output == 1:
+            result = 'Medium'
             st.warning("Medium")
         else:
+            result = 'Strong'
             st.success("Strong")
+
+        score = password_strength(input_password)
+        # Password strength bar
+        st.markdown(
+            f"""
+            <div class="password-strength-bar {result}" style="width: {score * 20}%;"></div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("### Password Tips:")
+        st.markdown(f"- {':heavy_check_mark:' if len(input_password) >= 8 else ':x:'} Use more characters")
+        st.markdown(f"- {':heavy_check_mark:' if re.search('[a-z]', input_password) else ':x:'} Use lowercase letters")
+        st.markdown(f"- {':heavy_check_mark:' if re.search('[A-Z]', input_password) else ':x:'} Use uppercase letters")
+        st.markdown(f"- {':heavy_check_mark:' if re.search('[0-9]', input_password) else ':x:'} Add numbers")
+        st.markdown(f"- {':heavy_check_mark:' if re.search('[@#$%^&+=]', input_password) else ':x:'} Add special characters")
 
 
 # Generates a password
