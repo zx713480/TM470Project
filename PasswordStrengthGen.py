@@ -13,18 +13,23 @@ def getTokens(inputString):
         tokens.append(i)
     return tokens
 
+@st.cache_data
+def load_words():
+    with open("/Users/charlie/Documents/TM470Project/data/English_Words.txt", "r") as words:
+        word_list = words.read().split()
+    return word_list
 
-
+@st.cache_data
 # Loads the machine learning model
 def load_model():
-    with open('/Users/charlie/Documents/GitHub/TM470Project/data/model', 'rb') as model:
+    with open('/Users/charlie/Documents/TM470Project/ML_model', 'rb') as model:
         loaded_model = joblib.load(model)
     return loaded_model
 
 
-
+@st.cache_data
 def load_vectorizer():
-    with open('/Users/charlie/Documents/GitHub/TM470Project/data/password_v', 'rb') as password_vec:
+    with open('/Users/charlie/Documents/TM470Project/password_v', 'rb') as password_vec:
         password_v = joblib.load(password_vec)
     return password_v
 
@@ -72,7 +77,19 @@ with strength_check:
 # Generates a password
 with password_gen:
     st.header("Generate Strong Password")
-    password_length = st.slider("Password Characters", min_value=12, max_value=25, step=1)
-    if st.button("Generate"):
-        strong_password = generate_strong_password(password_length)
-        st.write("Your generated password: \n", strong_password)
+    password_choice = st.selectbox('Please select whether you\'d like to create a multi-character password, or multi-phrase passphrase.', ['Password', 'Passphrase'])
+    if password_choice == 'Password':
+        password_length = st.slider("Number of Characters", min_value=12, max_value=25, step=1)
+        if st.button("Generate"):
+            strong_password = generate_strong_password(password_length)
+            st.success("Your generated password:")
+            st.code(strong_password, language='')
+    if password_choice == 'Passphrase':
+        words = load_words()
+        passphrase_length = st.slider("Number of Words", min_value=3, max_value=8, step=1)
+        if st.button("Generate"):
+            strong_passphrase = ""
+            for i in range(passphrase_length):
+                strong_passphrase += random.choice(words) + " "
+            st.success("Your generated passphrase:")
+            st.code(strong_passphrase, language='')
