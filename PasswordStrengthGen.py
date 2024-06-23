@@ -1,3 +1,4 @@
+# Imports
 import string
 import random
 import streamlit as st
@@ -19,7 +20,6 @@ def load_words():
         word_list = words.read().split()
     return word_list
 
-
 @st.cache_data
 # Loads the machine learning model
 def load_model():
@@ -37,8 +37,16 @@ def load_vectorizer():
 
 # Function that generates a strong password of length 'length' when called
 def generate_strong_password(length):
+    # Stores ascii letters, digits and punctuation in variable "characters"
     characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
+    # Stores n number of random characters of size "length-4" into variable "password"
+    password = ''.join(random.choice(characters) for i in range(length - 4))
+    # Adds a punctuation character, uppercase, lowercase letter and a digit to ensure the password
+    # meets the requirements
+    password += (random.choice(string.punctuation) + random.choice(string.ascii_uppercase) +
+                 random.choice(string.ascii_lowercase) + random.choice(string.digits))
+    # returns password
+
     return password
 
 def password_strength(password):
@@ -111,8 +119,13 @@ with strength_check:
     # If the button is clicked, the loaded ML model will predict the inputted password
     # and produce an output
     if st.button("Check"):
-        vect_pswd = vectorizer.transform([input_password]).toarray()
-        prediction_output = prediction.predict(vect_pswd)
+        with open('data/data.csv') as file:
+            contents = file.read()
+            if input_password in contents:
+                prediction_output = 0
+            else:
+                vect_pswd = vectorizer.transform([input_password]).toarray()
+                prediction_output = prediction.predict(vect_pswd)
         result = ''
         if prediction_output == 0:
             result = 'Weak'
@@ -124,6 +137,8 @@ with strength_check:
             result = 'Strong'
             st.success("Strong")
 
+
+
         score = password_strength(input_password)
         # Password strength bar
         st.markdown(
@@ -134,7 +149,7 @@ with strength_check:
         )
 
         st.markdown("### Password Tips:")
-        st.markdown(f"- {':heavy_check_mark:' if len(input_password) >= 8 else ':x:'} Use more characters")
+        st.markdown(f"- {':heavy_check_mark:' if len(input_password) >= 12 else ':x:'} Use more characters")
         st.markdown(f"- {':heavy_check_mark:' if re.search('[a-z]', input_password) else ':x:'} Use lowercase letters")
         st.markdown(f"- {':heavy_check_mark:' if re.search('[A-Z]', input_password) else ':x:'} Use uppercase letters")
         st.markdown(f"- {':heavy_check_mark:' if re.search('[0-9]', input_password) else ':x:'} Add numbers")
