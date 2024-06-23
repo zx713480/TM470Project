@@ -79,7 +79,7 @@ password_gen = st.container()
 
 # Title of webpage
 with title:
-    st.title("Password Strength Checker & Generator :key:")
+    st.title(":lock: Password Strength Checker & Generator")
     with st.expander('About this app'):
         st.write("This application helps you to check the strength of your password using the power of machine learning and AI"
                  "It can also create a strong password or passphrase for you.")
