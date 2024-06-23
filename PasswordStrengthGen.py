@@ -15,21 +15,22 @@ def getTokens(inputString):
 
 @st.cache_data
 def load_words():
-    with open("/Users/charlie/Documents/TM470Project/data/English_Words.txt", "r") as words:
+    with open("/TM470Project/data/English_Words.txt", "r") as words:
         word_list = words.read().split()
     return word_list
+
 
 @st.cache_data
 # Loads the machine learning model
 def load_model():
-    with open('/Users/charlie/Documents/TM470Project/ML_model', 'rb') as model:
+    with open('/TM470Project/data/model', 'rb') as model:
         loaded_model = joblib.load(model)
     return loaded_model
 
 
 @st.cache_data
 def load_vectorizer():
-    with open('/Users/charlie/Documents/TM470Project/password_v', 'rb') as password_vec:
+    with open('/TM470Project/data/password_v', 'rb') as password_vec:
         password_v = joblib.load(password_vec)
     return password_v
 
