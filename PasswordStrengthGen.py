@@ -2,7 +2,7 @@ import string
 import random
 import streamlit as st
 import joblib
-import sklearn
+#import sklearn
 import re
 
 
