@@ -168,7 +168,7 @@ with password_gen:
             st.code(strong_password, language='')
     if password_choice == 'Passphrase':
         words = load_words()
-        passphrase_length = st.slider("Number of Words", min_value=3, max_value=8, step=1)
+        passphrase_length = st.slider("Number of Words", min_value=4, max_value=8, step=1)
         if st.button("Generate"):
             strong_passphrase = ""
             for i in range(passphrase_length):
