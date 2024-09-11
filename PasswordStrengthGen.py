@@ -148,7 +148,7 @@ if page == 'Strength Check and Password Gen':
             result = ''
             # First checks if the password is in the data.csv file which is the file the model was trained on.
             # This is to make sure that the user isn't using a password that has already been leaked.
-            with open('/Users/charlie/Documents/TM470Project/data/data.csv') as file:
+            with open('data/data.csv') as file:
                 contents = file.read()
                 # Tells the user if their password is in the data leak file
                 if input_password in contents:
